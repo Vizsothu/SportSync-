@@ -1,0 +1,434 @@
+import React, { useState, useEffect } from 'react';
+import { Calendar, MapPin, Clock, Users, User, Trophy, Target, Bell, Settings, LogOut, Plus, Filter, Search } from 'lucide-react';
+
+const SportsApp = () => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [currentView, setCurrentView] = useState('login');
+  const [userType, setUserType] = useState('individual');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Mock data
+  const venues = [
+    { id: 1, name: 'SportCenter Arena', location: 'Downtown', sport: 'Basketball', available: true, price: '$25/hour', image: '🏀' },
+    { id: 2, name: 'Elite Tennis Club', location: 'North Side', sport: 'Tennis', available: true, price: '$30/hour', image: '🎾' },
+    { id: 3, name: 'City Football Ground', location: 'South Park', sport: 'Football', available: false, price: '$40/hour', image: '⚽' },
+    { id: 4, name: 'Aqua Swimming Pool', location: 'West End', sport: 'Swimming', available: true, price: '$20/hour', image: '🏊' }
+  ];
+
+  const upcomingSessions = [
+    { id: 1, title: 'Basketball Training', time: '2:00 PM - 4:00 PM', date: 'Today', type: 'training', venue: 'SportCenter Arena' },
+    { id: 2, title: 'Match vs Thunder Team', time: '6:00 PM - 8:00 PM', date: 'Tomorrow', type: 'match', venue: 'City Football Ground' },
+    { id: 3, title: 'Tennis Practice', time: '10:00 AM - 12:00 PM', date: 'Friday', type: 'training', venue: 'Elite Tennis Club' }
+  ];
+
+  const challenges = [
+    { id: 1, from: 'Lightning Bolts', sport: 'Basketball', status: 'pending', date: '2024-06-05' },
+    { id: 2, from: 'John Smith', sport: 'Tennis', status: 'accepted', date: '2024-06-07' }
+  ];
+
+  const LoginScreen = () => (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="bg-blue-500 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Trophy className="text-white w-8 h-8" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">SportsTech</h1>
+          <p className="text-gray-600">Connect, Play, Win</p>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex bg-gray-100 rounded-2xl p-1">
+            <button 
+              onClick={() => setUserType('individual')}
+              className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
+                userType === 'individual' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600'
+              }`}
+            >
+              Individual
+            </button>
+            <button 
+              onClick={() => setUserType('team')}
+              className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
+                userType === 'team' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600'
+              }`}
+            >
+              Team
+            </button>
+          </div>
+
+          <input 
+            type="email" 
+            placeholder="Email address" 
+            className="w-full p-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <input 
+            type="password" 
+            placeholder="Password" 
+            className="w-full p-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          
+          <button 
+            onClick={() => {
+              setCurrentUser({ name: userType === 'individual' ? 'Alex Johnson' : 'Thunder Team', type: userType });
+              setCurrentView('dashboard');
+            }}
+            className="w-full bg-blue-500 text-white py-4 rounded-2xl font-semibold hover:bg-blue-600 transition-colors"
+          >
+            Sign In
+          </button>
+          
+          <p className="text-center text-gray-600 text-sm">
+            Don't have an account? <span className="text-blue-500 cursor-pointer">Sign up</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const Dashboard = () => (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="bg-blue-500 w-10 h-10 rounded-xl flex items-center justify-center">
+              <Trophy className="text-white w-5 h-5" />
+            </div>
+            <h1 className="text-xl font-bold text-gray-900">SportsTech</h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Bell className="w-6 h-6 text-gray-400 cursor-pointer hover:text-gray-600" />
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <User className="w-4 h-4 text-blue-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto p-4 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Welcome back, {currentUser?.name}!</h2>
+            <p className="text-gray-600">Ready for your next session?</p>
+          </div>
+          <div className="flex space-x-2">
+            <button 
+              onClick={() => setCurrentView('venues')}
+              className="bg-blue-500 text-white px-6 py-3 rounded-2xl font-semibold hover:bg-blue-600 transition-colors flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Book Venue</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-3xl p-6 shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Next Session</h3>
+              <div className="bg-green-100 px-3 py-1 rounded-full">
+                <span className="text-green-800 text-sm font-medium">Today</span>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <h4 className="font-semibold text-gray-900">Basketball Training</h4>
+              <div className="flex items-center space-x-2 text-gray-600">
+                <Clock className="w-4 h-4" />
+                <span className="text-sm">2:00 PM - 4:00 PM</span>
+              </div>
+              <div className="flex items-center space-x-2 text-gray-600">
+                <MapPin className="w-4 h-4" />
+                <span className="text-sm">SportCenter Arena</span>
+              </div>
+              <button className="w-full bg-blue-50 text-blue-600 py-3 rounded-2xl font-semibold hover:bg-blue-100 transition-colors">
+                Start Session
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Quick Stats</h3>
+              <Target className="w-6 h-6 text-blue-500" />
+            </div>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Sessions this week</span>
+                <span className="font-semibold text-gray-900">4</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Hours played</span>
+                <span className="font-semibold text-gray-900">12.5</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Win rate</span>
+                <span className="font-semibold text-green-600">78%</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Challenges</h3>
+              <div className="bg-red-100 px-2 py-1 rounded-full">
+                <span className="text-red-800 text-xs font-medium">2 New</span>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {challenges.slice(0, 2).map(challenge => (
+                <div key={challenge.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-2xl">
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">{challenge.from}</p>
+                    <p className="text-gray-600 text-xs">{challenge.sport}</p>
+                  </div>
+                  <button className="bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-600">
+                    {challenge.status === 'pending' ? 'Accept' : 'View'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-3xl p-6 shadow-lg">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-gray-900">Upcoming Sessions</h3>
+            <button 
+              onClick={() => setCurrentView('calendar')}
+              className="text-blue-500 font-medium hover:text-blue-600"
+            >
+              View Calendar
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {upcomingSessions.map(session => (
+              <div key={session.id} className="border border-gray-200 rounded-2xl p-4 hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    session.type === 'training' ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'
+                  }`}>
+                    {session.type === 'training' ? 'Training' : 'Match'}
+                  </div>
+                  <span className="text-gray-500 text-xs">{session.date}</span>
+                </div>
+                <h4 className="font-semibold text-gray-900 mb-2">{session.title}</h4>
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <Clock className="w-3 h-3" />
+                    <span className="text-sm">{session.time}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <MapPin className="w-3 h-3" />
+                    <span className="text-sm">{session.venue}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 md:hidden">
+        <div className="flex justify-around">
+          <button 
+            onClick={() => setCurrentView('dashboard')}
+            className={`flex flex-col items-center space-y-1 ${currentView === 'dashboard' ? 'text-blue-500' : 'text-gray-400'}`}
+          >
+            <User className="w-5 h-5" />
+            <span className="text-xs">Dashboard</span>
+          </button>
+          <button 
+            onClick={() => setCurrentView('calendar')}
+            className={`flex flex-col items-center space-y-1 ${currentView === 'calendar' ? 'text-blue-500' : 'text-gray-400'}`}
+          >
+            <Calendar className="w-5 h-5" />
+            <span className="text-xs">Calendar</span>
+          </button>
+          <button 
+            onClick={() => setCurrentView('venues')}
+            className={`flex flex-col items-center space-y-1 ${currentView === 'venues' ? 'text-blue-500' : 'text-gray-400'}`}
+          >
+            <MapPin className="w-5 h-5" />
+            <span className="text-xs">Venues</span>
+          </button>
+          <button className="flex flex-col items-center space-y-1 text-gray-400">
+            <Settings className="w-5 h-5" />
+            <span className="text-xs">Settings</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const VenuesScreen = () => (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={() => setCurrentView('dashboard')}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              ←
+            </button>
+            <h1 className="text-xl font-bold text-gray-900">Book Venue</h1>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Filter className="w-5 h-5 text-gray-400" />
+            <Search className="w-5 h-5 text-gray-400" />
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto p-4 space-y-6">
+        <div className="flex space-x-4 overflow-x-auto pb-2">
+          {['All', 'Basketball', 'Tennis', 'Football', 'Swimming'].map(sport => (
+            <button 
+              key={sport}
+              className="px-4 py-2 bg-white rounded-2xl text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 whitespace-nowrap border border-gray-200"
+            >
+              {sport}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {venues.map(venue => (
+            <div key={venue.id} className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-center">
+                <div className="text-4xl mb-2">{venue.image}</div>
+                <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                  venue.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
+                  {venue.available ? 'Available' : 'Booked'}
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{venue.name}</h3>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <MapPin className="w-4 h-4" />
+                    <span className="text-sm">{venue.location}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <Trophy className="w-4 h-4" />
+                    <span className="text-sm">{venue.sport}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-semibold text-gray-900">{venue.price}</span>
+                  </div>
+                </div>
+                <button 
+                  disabled={!venue.available}
+                  className={`w-full py-3 rounded-2xl font-semibold transition-colors ${
+                    venue.available 
+                      ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  {venue.available ? 'Book Now' : 'Unavailable'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const CalendarScreen = () => (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={() => setCurrentView('dashboard')}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              ←
+            </button>
+            <h1 className="text-xl font-bold text-gray-900">Calendar</h1>
+          </div>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-2xl text-sm font-semibold hover:bg-blue-600">
+            + Add Event
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto p-4 space-y-6">
+        <div className="bg-white rounded-3xl p-6 shadow-lg">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-gray-900">June 2025</h3>
+            <div className="flex space-x-2">
+              <button className="text-gray-400 hover:text-gray-600">←</button>
+              <button className="text-gray-400 hover:text-gray-600">→</button>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-7 gap-2 mb-4">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="text-center text-gray-500 text-sm font-medium py-2">
+                {day}
+              </div>
+            ))}
+          </div>
+          
+          <div className="grid grid-cols-7 gap-2">
+            {Array.from({ length: 30 }, (_, i) => i + 1).map(day => (
+              <div 
+                key={day}
+                className={`aspect-square flex items-center justify-center text-sm rounded-xl cursor-pointer transition-colors ${
+                  day === 3 ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
+                } ${
+                  [5, 12, 18, 25].includes(day) ? 'bg-orange-100 text-orange-800 font-medium' : ''
+                }`}
+              >
+                {day}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-3xl p-6 shadow-lg">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Today's Schedule</h3>
+          <div className="space-y-4">
+            {upcomingSessions.filter(session => session.date === 'Today').map(session => (
+              <div key={session.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-2xl">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Trophy className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900">{session.title}</h4>
+                  <p className="text-gray-600 text-sm">{session.time}</p>
+                  <p className="text-gray-500 text-sm">{session.venue}</p>
+                </div>
+                <button className="bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-600">
+                  Join
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderCurrentView = () => {
+    if (!currentUser) return <LoginScreen />;
+    
+    switch (currentView) {
+      case 'dashboard':
+        return <Dashboard />;
+      case 'venues':
+        return <VenuesScreen />;
+      case 'calendar':
+        return <CalendarScreen />;
+      default:
+        return <Dashboard />;
+    }
+  };
+
+  return renderCurrentView();
+};
+
+export default SportsApp;
